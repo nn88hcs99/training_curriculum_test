@@ -26,6 +26,9 @@ class CalendarsController < ApplicationController
     @todays_date = Date.today
     # 例)　今日が2月1日の場合・・・ Date.today.day => 1日
 
+    # 基準日を元に曜日配列を並び替え
+    adjusted_wdays = wdays.rotate(@todays_date.wday)
+
     @week_days = []
 
     plans = Plan.where(date: @todays_date..@todays_date + 6)
@@ -35,7 +38,10 @@ class CalendarsController < ApplicationController
       plans.each do |plan|
         today_plans.push(plan.plan) if plan.date == @todays_date + x
       end
-      days = { month: (@todays_date + x).month, date: (@todays_date + x).day, plans: today_plans }
+      wday = adjusted_wdays[x] # 曜日を取得する部分
+
+      days = { month: (@todays_date + x).month, date: (@todays_date + x).day, wday: wday, 
+      plans: today_plans }
       @week_days.push(days)
     end
 
